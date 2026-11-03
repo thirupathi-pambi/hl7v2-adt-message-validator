@@ -1,35 +1,77 @@
 # HL7 v2 ADT Message Parser & Validator
 
-> **Portfolio demonstration | Synthetic / fictional data only**
+![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-A focused HL7 v2 pipe-delimited ADT exercise that parses MSH/PID/PV1 segments and checks common message requirements.
+A lightweight Python tool that parses pipe-delimited HL7 v2 ADT messages and validates the structure that interfaces most commonly depend on, then writes a JSON report of errors and warnings.
 
-## What this demonstrates
-- Parse line-oriented HL7 v2 messages with configurable field separator from MSH
-- Validate essential ADT structure and identifiers
-- Export JSON audit report with explicit errors and warnings
+> Built on synthetic messages only. This is an instructional validator, not a full HL7 standard implementation.
+
+## Why this exists
+
+ADT (admit / discharge / transfer) feeds are the backbone of hospital integrations, and malformed messages are a common cause of interface errors. This project shows how to parse HL7 v2 correctly (including the easy-to-miss detail that `MSH-1` *is* the field separator) and turn validation results into a structured, machine-readable report.
+
+## What it checks
+
+| Check | Result if it fails |
+|---|---|
+| Message starts with a well-formed `MSH` segment | Error (validation stops) |
+| `PID` segment present | Error |
+| `PV1` segment present | Error |
+| `MSH-9` message type starts with `ADT^` | Error |
+| `MSH-10` message control ID present | Error |
+| `PID-3` patient identifier present | Error |
+| `EVN` segment present | Warning |
+
+The field separator is read from the message header rather than hard-coded.
+
+## Project structure
+
+```
+.
+├── data/
+│   ├── valid_adt.hl7          # fictional message that passes
+│   └── invalid_adt.hl7        # fictional message that fails validation
+├── src/
+│   └── main.py                # parser and validator
+├── tests/
+│   └── test_main.py
+├── output/
+│   └── validation_report.json # generated report
+├── LICENSE
+└── README.md
+```
 
 ## Quick start
+
+Requires Python 3.10+ (standard library only). Run from the repository root.
+
 ```bash
-python src/main.py
+python src/main.py                      # validates every .hl7 file in data/
 python -m unittest discover -s tests
 ```
 
-Python 3.10+ is recommended. Core functionality uses the Python standard library; no API keys or patient records are required. Run commands from the repository root.
+## Example report (shape)
 
-## Repository contents
-- `data/`: two fictional messages
-- `src/main.py`: parser and validators
-- `output/`: JSON report
+Each file in `data/` gets an entry like this (values illustrative):
 
-## Relevant skills
-HL7 v2, ADT messages, validation, healthcare interfaces, Python
+```json
+{
+  "invalid_adt.hl7": {
+    "valid": false,
+    "errors": ["Missing patient identifier (PID-3)"],
+    "warnings": ["EVN segment not found"],
+    "message_type": "ADT^A01",
+    "segments": ["MSH", "PID", "PV1"]
+  }
+}
+```
 
-## Data and privacy
-All records, facilities, identifiers, events and organizations in this repository are fabricated for demonstrations. This is **not** a production clinical system and does not contain real protected health information (PHI). Do not upload real patient data or confidential employer files. Outputs do not substitute for clinical, privacy, security, or regulatory review.
+## Limitations and next steps
 
-## How to discuss in an interview
-Explain the input, validations or transformations, measurable outputs, tests, and what you would change for a real deployment (authentication, audit logs, monitoring, regulatory review, and secure storage). Describe this as a **personal portfolio project**, not as an implementation at an employer.
+- Does not validate data types, code tables, or segment cardinality from the HL7 specification.
+- Validates ADT structure only; no ORU, ORM, or other message types.
+- Possible extensions: per-trigger-event rules (A01, A03, A08), field-level format checks (dates, sex codes), an MLLP listener for live feeds, and use of an established parser library for full-spec coverage.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+
+MIT. See [LICENSE](LICENSE).
