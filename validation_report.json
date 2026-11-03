@@ -1,0 +1,30 @@
+{
+  "invalid_adt.hl7": {
+    "valid": false,
+    "errors": [
+      "Missing PV1 segment",
+      "Missing message control ID (MSH-10)",
+      "Missing patient identifier (PID-3)"
+    ],
+    "warnings": [
+      "EVN segment not found"
+    ],
+    "message_type": "ADT^A01",
+    "segments": [
+      "MSH",
+      "PID"
+    ]
+  },
+  "valid_adt.hl7": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "message_type": "ADT^A01",
+    "segments": [
+      "MSH",
+      "EVN",
+      "PID",
+      "PV1"
+    ]
+  }
+}
