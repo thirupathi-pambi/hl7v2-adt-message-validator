@@ -72,6 +72,4 @@ Each file in `data/` gets an entry like this (values illustrative):
 - Validates ADT structure only; no ORU, ORM, or other message types.
 - Possible extensions: per-trigger-event rules (A01, A03, A08), field-level format checks (dates, sex codes), an MLLP listener for live feeds, and use of an established parser library for full-spec coverage.
 
-## License
 
-MIT. See [LICENSE](LICENSE).
